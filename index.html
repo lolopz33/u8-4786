@@ -1,78 +1,301 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webhook Tester (Educational Use Only)</title>
+    <title>Webhook Tester | Ferramenta Educacional</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
+        :root {
+            --primary: #5865F2;
+            --primary-hover: #4752C4;
+            --danger: #ED4245;
+            --danger-hover: #D1373A;
+            --success: #3BA55C;
+            --warning: #F0B232;
+            --background: #F8F9FA;
+            --card-bg: #FFFFFF;
+            --text: #2C2F33;
+            --text-light: #72767D;
+            --border: #DCDDDE;
         }
-        .container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        input, textarea, button {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+        
+        * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
-        button {
-            background-color: #5865F2;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
+        
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        button:hover {
-            background-color: #4752C4;
-        }
-        .warning {
-            background-color: #FFF3CD;
-            padding: 15px;
-            border-radius: 4px;
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
             margin-bottom: 20px;
-            border-left: 5px solid #FFC107;
+        }
+        
+        .header {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 25px;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: flex-start;
+            background-color: rgba(240, 178, 50, 0.1);
+            border-left: 4px solid var(--warning);
+        }
+        
+        .alert i {
+            margin-right: 10px;
+            color: var(--warning);
+            font-size: 18px;
+            margin-top: 2px;
+        }
+        
+        .alert-content h3 {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: var(--warning);
+        }
+        
+        .alert-content p {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--text);
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(88, 101, 242, 0.2);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .input-group .form-group {
+            flex: 1;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            background-color: var(--primary-hover);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover:not(:disabled) {
+            background-color: var(--danger-hover);
+        }
+        
+        #status {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+            display: none;
+        }
+        
+        .status-error {
+            background-color: rgba(237, 66, 69, 0.1);
+            color: var(--danger);
+            border-left: 4px solid var(--danger);
+            display: block;
+        }
+        
+        .status-success {
+            background-color: rgba(59, 165, 92, 0.1);
+            color: var(--success);
+            border-left: 4px solid var(--success);
+            display: block;
+        }
+        
+        .status-info {
+            background-color: rgba(88, 101, 242, 0.1);
+            color: var(--primary);
+            border-left: 4px solid var(--primary);
+            display: block;
+        }
+        
+        footer {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: auto;
+            padding: 20px;
+        }
+        
+        @media (max-width: 600px) {
+            .input-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="warning">
-            <strong>Warning:</strong> This tool is for educational purposes only. Misuse of webhooks violates Discord's Terms of Service and can result in account termination. Only use this on your own servers for testing.
+        <div class="header">
+            <h1><i class="fas fa-bolt"></i> Webhook Tester</h1>
+            <p>Ferramenta para testes educacionais</p>
         </div>
         
-        <h1>Webhook Tester</h1>
-        
-        <label for="webhookUrl">Webhook URL:</label>
-        <input type="text" id="webhookUrl" placeholder="https://discord.com/api/webhooks/...">
-        
-        <label for="message">Message:</label>
-        <textarea id="message" rows="4" placeholder="Enter your message here"></textarea>
-        
-        <label for="imageUrl">Image/GIF URL (optional):</label>
-        <input type="text" id="imageUrl" placeholder="https://example.com/image.png">
-        
-        <label for="repeat">Repeat Count (1-5):</label>
-        <input type="number" id="repeat" min="1" max="5" value="1">
-        
-        <label for="delay">Delay between messages (ms):</label>
-        <input type="number" id="delay" min="100" value="1000">
-        
-        <button id="sendButton">Send Message</button>
-        <button id="stopButton" style="background-color: #ED4245; display: none;">Stop Sending</button>
-        
-        <div id="status"></div>
+        <div class="content">
+            <div class="alert">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div class="alert-content">
+                    <h3>Aviso Importante</h3>
+                    <p>Esta ferramenta é apenas para fins educacionais. O uso indevido de webhooks viola os Termos de Serviço do Discord e pode resultar em encerramento da conta. Use apenas em seus próprios servidores para testes.</p>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="webhookUrl"><i class="fas fa-link"></i> URL do Webhook</label>
+                <input type="text" id="webhookUrl" placeholder="https://discord.com/api/webhooks/..." spellcheck="false">
+            </div>
+            
+            <div class="form-group">
+                <label for="message"><i class="fas fa-comment-alt"></i> Mensagem</label>
+                <textarea id="message" placeholder="Digite sua mensagem aqui"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="imageUrl"><i class="fas fa-image"></i> URL da Imagem/GIF (opcional)</label>
+                <input type="text" id="imageUrl" placeholder="https://exemplo.com/imagem.png" spellcheck="false">
+            </div>
+            
+            <div class="input-group">
+                <div class="form-group">
+                    <label for="repeat"><i class="fas fa-redo"></i> Repetição (1-5)</label>
+                    <input type="number" id="repeat" min="1" max="5" value="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="delay"><i class="fas fa-clock"></i> Intervalo (ms)</label>
+                    <input type="number" id="delay" min="100" value="1000">
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button id="sendButton" class="btn-primary">
+                    <i class="fas fa-paper-plane"></i> Enviar Mensagem
+                </button>
+                <button id="stopButton" class="btn-danger" style="display: none;">
+                    <i class="fas fa-stop"></i> Parar Envio
+                </button>
+            </div>
+            
+            <div id="status"></div>
+        </div>
     </div>
+    
+    <footer>
+        <p>Webhook Tester &copy; 2023 - Para uso educacional apenas</p>
+    </footer>
 
     <script>
         let isSending = false;
@@ -87,35 +310,48 @@
             const repeat = parseInt(document.getElementById('repeat').value);
             const delay = parseInt(document.getElementById('delay').value);
             
+            // Validação dos campos
             if (!webhookUrl) {
-                updateStatus('Please enter a webhook URL', 'error');
+                updateStatus('Por favor, insira a URL do webhook', 'error');
                 return;
             }
             
             if (!message && !imageUrl) {
-                updateStatus('Please enter a message or image URL', 'error');
+                updateStatus('Por favor, insira uma mensagem ou URL de imagem', 'error');
                 return;
             }
             
-            if (repeat < 1 || repeat > 5) {
-                updateStatus('Repeat count must be between 1 and 5', 'error');
+            if (isNaN(repeat) || repeat < 1 || repeat > 5) {
+                updateStatus('A contagem de repetição deve ser entre 1 e 5', 'error');
                 return;
             }
             
+            if (isNaN(delay) || delay < 100) {
+                updateStatus('O intervalo deve ser de pelo menos 100ms', 'error');
+                return;
+            }
+            
+            // Configuração do estado de envio
             isSending = true;
             stopSending = false;
-            document.getElementById('sendButton').style.display = 'none';
-            document.getElementById('stopButton').style.display = 'block';
+            document.getElementById('sendButton').disabled = true;
+            document.getElementById('stopButton').style.display = 'flex';
             
-            updateStatus(`Sending ${repeat} message(s)...`, 'info');
+            updateStatus(`Enviando ${repeat} mensagem(s)...`, 'info');
             
             try {
                 for (let i = 0; i < repeat && !stopSending; i++) {
-                    if (i > 0) await new Promise(resolve => setTimeout(resolve, delay));
-                    if (stopSending) break;
+                    if (i > 0) {
+                        // Mostrar contagem regressiva para o próximo envio
+                        const remaining = repeat - i;
+                        updateStatus(`Aguardando... ${remaining} ${remaining > 1 ? 'envios' : 'envio'} restante(s)`, 'info');
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        if (stopSending) break;
+                    }
                     
+                    // Preparar o payload
                     const payload = {
-                        content: message
+                        content: message || null
                     };
                     
                     if (imageUrl) {
@@ -126,6 +362,8 @@
                         }];
                     }
                     
+                    // Enviar a requisição
+                    const startTime = performance.now();
                     const response = await fetch(webhookUrl, {
                         method: 'POST',
                         headers: {
@@ -133,32 +371,38 @@
                         },
                         body: JSON.stringify(payload)
                     });
+                    const endTime = performance.now();
+                    const duration = Math.round(endTime - startTime);
                     
                     if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
+                        throw new Error(`Erro HTTP! Status: ${response.status}`);
                     }
                     
-                    updateStatus(`Sent message ${i+1} of ${repeat}`, 'success');
+                    updateStatus(`Mensagem ${i+1} de ${repeat} enviada (${duration}ms)`, 'success');
                 }
                 
-                updateStatus(stopSending ? 'Stopped sending messages' : 'All messages sent!', 'success');
+                updateStatus(stopSending ? 'Envio interrompido' : 'Todas as mensagens foram enviadas!', stopSending ? 'error' : 'success');
             } catch (error) {
-                updateStatus(`Error: ${error.message}`, 'error');
+                console.error('Erro:', error);
+                updateStatus(`Erro: ${error.message}`, 'error');
             } finally {
                 isSending = false;
-                document.getElementById('sendButton').style.display = 'block';
+                document.getElementById('sendButton').disabled = false;
                 document.getElementById('stopButton').style.display = 'none';
             }
         });
         
         document.getElementById('stopButton').addEventListener('click', function() {
             stopSending = true;
+            updateStatus('Interrompendo envio...', 'error');
+            document.getElementById('stopButton').disabled = true;
         });
         
         function updateStatus(text, type) {
             const statusElement = document.getElementById('status');
             statusElement.textContent = text;
-            statusElement.style.color = type === 'error' ? '#ED4245' : type === 'success' ? '#3BA55C' : '#5865F2';
+            statusElement.className = '';
+            statusElement.classList.add(`status-${type}`);
         }
     </script>
 </body>
