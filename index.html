@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webhook Tester | Ferramenta Educacional</title>
+    <title>Webhook Tester | Ferramenta FUCKER</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -217,12 +217,26 @@
             display: block;
         }
         
+        .status-warning {
+            background-color: rgba(240, 178, 50, 0.1);
+            color: var(--warning);
+            border-left: 4px solid var(--warning);
+            display: block;
+        }
+        
         footer {
             text-align: center;
             font-size: 12px;
             color: var(--text-light);
             margin-top: auto;
             padding: 20px;
+        }
+        
+        .counter {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-top: 5px;
+            text-align: right;
         }
         
         @media (max-width: 600px) {
@@ -270,13 +284,15 @@
             
             <div class="input-group">
                 <div class="form-group">
-                    <label for="repeat"><i class="fas fa-redo"></i> Repetição (1-5)</label>
-                    <input type="number" id="repeat" min="1" max="5" value="1">
+                    <label for="repeat"><i class="fas fa-redo"></i> Repetição (0 para infinito)</label>
+                    <input type="number" id="repeat" min="0" value="1">
+                    <div class="counter">0 = loop infinito</div>
                 </div>
                 
                 <div class="form-group">
                     <label for="delay"><i class="fas fa-clock"></i> Intervalo (ms)</label>
                     <input type="number" id="delay" min="100" value="1000">
+                    <div class="counter">mínimo 100ms</div>
                 </div>
             </div>
             
@@ -300,6 +316,7 @@
     <script>
         let isSending = false;
         let stopSending = false;
+        let messageCount = 0;
         
         document.getElementById('sendButton').addEventListener('click', async function() {
             if (isSending) return;
@@ -316,13 +333,18 @@
                 return;
             }
             
+            if (!webhookUrl.includes('discord.com/api/webhooks/')) {
+                updateStatus('URL do webhook inválida. Deve ser um webhook do Discord', 'error');
+                return;
+            }
+            
             if (!message && !imageUrl) {
                 updateStatus('Por favor, insira uma mensagem ou URL de imagem', 'error');
                 return;
             }
             
-            if (isNaN(repeat) || repeat < 1 || repeat > 5) {
-                updateStatus('A contagem de repetição deve ser entre 1 e 5', 'error');
+            if (isNaN(repeat) || repeat < 0) {
+                updateStatus('A contagem de repetição deve ser 0 (infinito) ou maior', 'error');
                 return;
             }
             
@@ -334,17 +356,21 @@
             // Configuração do estado de envio
             isSending = true;
             stopSending = false;
+            messageCount = 0;
             document.getElementById('sendButton').disabled = true;
             document.getElementById('stopButton').style.display = 'flex';
             
-            updateStatus(`Enviando ${repeat} mensagem(s)...`, 'info');
+            updateStatus('Preparando envio...', 'info');
             
             try {
-                for (let i = 0; i < repeat && !stopSending; i++) {
+                const isInfinite = repeat === 0;
+                let i = 0;
+                
+                while ((isInfinite || i < repeat) && !stopSending) {
                     if (i > 0) {
                         // Mostrar contagem regressiva para o próximo envio
-                        const remaining = repeat - i;
-                        updateStatus(`Aguardando... ${remaining} ${remaining > 1 ? 'envios' : 'envio'} restante(s)`, 'info');
+                        const remaining = isInfinite ? '∞' : repeat - i;
+                        updateStatus(`Aguardando próximo envio... ${isInfinite ? '∞' : remaining} ${isInfinite ? '' : remaining > 1 ? 'envios' : 'envio'} restante(s) | Total enviado: ${messageCount}`, 'info');
                         await new Promise(resolve => setTimeout(resolve, delay));
                         if (stopSending) break;
                     }
@@ -378,13 +404,23 @@
                         throw new Error(`Erro HTTP! Status: ${response.status}`);
                     }
                     
-                    updateStatus(`Mensagem ${i+1} de ${repeat} enviada (${duration}ms)`, 'success');
+                    messageCount++;
+                    i++;
+                    
+                    if (isInfinite) {
+                        updateStatus(`Mensagem ${messageCount} enviada (${duration}ms) - Modo infinito ativo`, 'warning');
+                    } else {
+                        updateStatus(`Mensagem ${i} de ${repeat} enviada (${duration}ms) | Total: ${messageCount}`, 'success');
+                    }
                 }
                 
-                updateStatus(stopSending ? 'Envio interrompido' : 'Todas as mensagens foram enviadas!', stopSending ? 'error' : 'success');
+                updateStatus(stopSending ? 
+                    `Envio interrompido. Total de mensagens enviadas: ${messageCount}` : 
+                    `Concluído! Total de mensagens enviadas: ${messageCount}`, 
+                    stopSending ? 'error' : 'success');
             } catch (error) {
                 console.error('Erro:', error);
-                updateStatus(`Erro: ${error.message}`, 'error');
+                updateStatus(`Erro após ${messageCount} envios: ${error.message}`, 'error');
             } finally {
                 isSending = false;
                 document.getElementById('sendButton').disabled = false;
@@ -394,7 +430,7 @@
         
         document.getElementById('stopButton').addEventListener('click', function() {
             stopSending = true;
-            updateStatus('Interrompendo envio...', 'error');
+            updateStatus(`Interrompendo envio... Total enviado: ${messageCount}`, 'error');
             document.getElementById('stopButton').disabled = true;
         });
         
